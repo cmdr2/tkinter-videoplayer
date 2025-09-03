@@ -64,6 +64,7 @@ You can also edit the default theme by modifying `theme.py`.
 - `load`: Called when the video loads
 
 ## Usage Example
+See the [examples](examples/) folder for more.. examples!
 
 ```python
 from tkinter_video import VideoPlayer
