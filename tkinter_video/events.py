@@ -16,4 +16,4 @@ class EventDispatcher:
     def dispatch_event(self, event_type, **kwargs):
         listeners = self._event_listeners.get(event_type, [])
         for callback in listeners:
-            callback(event_type, **kwargs)
+            callback(**kwargs)

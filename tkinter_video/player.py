@@ -44,18 +44,24 @@ class VideoPlayer(EventDispatcher):
             self.seek_slider = self.controls_bar.slider_canvas if hasattr(self.controls_bar, "slider_canvas") else None
 
         # Forward video player events to component listeners
-        self.player.add_event_listener("play", self._forward_event)
-        self.player.add_event_listener("pause", self._forward_event)
+        self.player.add_event_listener("play", self._on_play)
+        self.player.add_event_listener("pause", self._on_pause)
         self.player.add_event_listener("ended", self._on_video_end)
-        self.player.add_event_listener("load", self._forward_event)
+        self.player.add_event_listener("load", self._on_load)
 
         if self._src:
             self.player.load(self._src)
             if self._autoplay:
                 self.player.play()
 
-    def _forward_event(self, event_type, **kwargs):
-        self.dispatch_event(event_type, **kwargs)
+    def _on_play(self):
+        self.dispatch_event("play")
+
+    def _on_pause(self):
+        self.dispatch_event("pause")
+
+    def _on_load(self):
+        self.dispatch_event("load")
 
     def _show_controls(self, event=None):
         if self.controls_bar and self.controls_bar.frame:
@@ -77,10 +83,12 @@ class VideoPlayer(EventDispatcher):
                 # Fallback: always show controls if state can't be determined
                 pass
 
-    def _on_video_end(self, event_type, **kwargs):
+    def _on_video_end(self):
         if self._loop:
             self.player.seek(0)
             self.player.play()
+
+        self.dispatch_event("ended")
 
     def _toggle_playback(self, event=None):
         was_playing = self.player.playing and not self.player.paused

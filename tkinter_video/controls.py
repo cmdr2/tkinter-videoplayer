@@ -10,9 +10,9 @@ class Controls:
         self._slider_dragging = False  # Track if slider is being dragged
 
         # Subscribe to video player events
-        videoplayer.add_event_listener("play", self._on_video_event)
-        videoplayer.add_event_listener("pause", self._on_video_event)
-        videoplayer.add_event_listener("ended", self._on_video_event)
+        videoplayer.add_event_listener("play", self._on_play)
+        videoplayer.add_event_listener("pause", self._on_pause)
+        videoplayer.add_event_listener("ended", self._on_ended)
 
         self.frame = tk.Frame(parent, bg=theme.COLOR_VIDEO_BG)
         self.frame.pack(fill=tk.X, padx=10, pady=5)
@@ -66,14 +66,16 @@ class Controls:
         """Redraw slider when the canvas is resized."""
         self._draw_slider()
 
-    def _on_video_event(self, event_type, **kwargs):
-        """Generic event handler for video player events"""
-        if event_type == "play":
-            self.is_playing = True
-        elif event_type == "pause" or event_type == "ended":
-            self.is_playing = False
+    def _on_play(self):
+        self.is_playing = True
+        self._update_play_pause_button()
 
-        # Always update button to match the current state
+    def _on_pause(self):
+        self.is_playing = False
+        self._update_play_pause_button()
+
+    def _on_ended(self):
+        self.is_playing = False
         self._update_play_pause_button()
 
     def _start_timer(self):

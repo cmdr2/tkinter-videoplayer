@@ -55,7 +55,7 @@ class Video(EventDispatcher):
         self.video_path = video_path
         self.cap = cv2.VideoCapture(self.video_path)
         self.frame_pos = 0
-        self.dispatch_event("load", path=video_path)
+        self.dispatch_event("load")
 
     def play(self):
         if not self.cap and self.video_path:
