@@ -35,8 +35,11 @@ class Video(EventDispatcher):
             if isinstance(parent_frame, tk.Frame):
                 parent_frame.event_generate(event_type, x=event.x, y=event.y)
 
-        for btn in ("<Button-1>", "<Button-2>", "<Enter>", "<Leave>", "<Key-space>"):
+        def bind_event(btn):
             self.video_img.bind(btn, lambda e, btn=btn: bubble_event_to_top(e, btn))
+
+        for btn in ("<Button-1>", "<Button-2>", "<Enter>", "<Leave>", "<Key-space>"):
+            bind_event(btn)
 
         # Bind resize event
         self.frame.bind("<Configure>", self._on_resize)
@@ -62,14 +65,16 @@ class Video(EventDispatcher):
         self.frame_pos = 0
         self.dispatch_event("load")
 
+    def _cancel_play_loop_callback(self):
+        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+            self.parent.after_cancel(self._play_loop_callback_id)
+            self._play_loop_callback_id = None
+
     def play(self):
         if not self.cap and self.video_path:
             self.cap = cv2.VideoCapture(self.video_path)
 
-        # Cancel any previous scheduled play loop callback before starting a new one
-        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
-            self.parent.after_cancel(self._play_loop_callback_id)
-            self._play_loop_callback_id = None
+        self._cancel_play_loop_callback()
 
         # Handle resuming from pause state
         if self.playing and self.paused:
@@ -107,10 +112,7 @@ class Video(EventDispatcher):
     def stop(self):
         self.playing = False
         self.paused = False
-        # Cancel any scheduled play loop callback
-        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
-            self.parent.after_cancel(self._play_loop_callback_id)
-            self._play_loop_callback_id = None
+        self._cancel_play_loop_callback()
         if self.cap:
             self.cap.release()
             self.cap = None
@@ -175,6 +177,14 @@ class Video(EventDispatcher):
         """
         if not self.cap:
             return
+
+        def handle_video_end():
+            self.playing = False
+            self.paused = False
+            self.frame_pos = 0
+            self._cancel_play_loop_callback()
+            self.dispatch_event("ended")
+
         if advance:
             ret, frame = self.cap.read()
             if not ret:
@@ -184,25 +194,10 @@ class Video(EventDispatcher):
                     self.frame_pos = 0
                     ret, frame = self.cap.read()
                     if not ret:
-                        # If still can't read, stop
-                        self.playing = False
-                        self.paused = False
-                        self.frame_pos = 0
-                        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
-                            self.parent.after_cancel(self._play_loop_callback_id)
-                            self._play_loop_callback_id = None
-                        self.dispatch_event("ended")
+                        handle_video_end()
                         return
                 else:
-                    # Cleanup playback state when video ends
-                    self.playing = False
-                    self.paused = False
-                    self.frame_pos = 0
-                    # Cancel any scheduled play loop callback
-                    if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
-                        self.parent.after_cancel(self._play_loop_callback_id)
-                        self._play_loop_callback_id = None
-                    self.dispatch_event("ended")
+                    handle_video_end()
                     return
             self.frame_pos = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
         else:
