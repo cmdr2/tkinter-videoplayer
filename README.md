@@ -30,7 +30,7 @@ player = VideoPlayer(root, video_path='sample.mp4', height=360)
 root.mainloop()
 ```
 
-## Public API
+## API
 
 ### `VideoPlayer(parent, video_path, **options)`
 
