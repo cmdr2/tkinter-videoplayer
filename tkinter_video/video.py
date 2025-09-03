@@ -7,7 +7,7 @@ from .events import EventDispatcher
 
 
 class Video(EventDispatcher):
-    def __init__(self, parent, width=640, height=480, loop=False):
+    def __init__(self, parent, width=640, height=480, loop=False, show_fps=True):
         super().__init__()
         self.parent = parent
         self.width = width
@@ -19,6 +19,12 @@ class Video(EventDispatcher):
         self.frame.pack_propagate(False)
         self.video_img = tk.Label(self.frame, bg="black")
         self.video_img.pack(fill=tk.BOTH, expand=1)
+        self.show_fps = show_fps
+        self.fps_label = None
+        if self.show_fps:
+            self.fps_label = tk.Label(self.frame, fg="#888", bg="black", font=("Arial", 8), anchor="ne")
+            self.fps_label.place(relx=1.0, rely=0.0, anchor="ne")
+        self._frame_times = []  # For FPS measurement
         self.thread = None
         self.frame_pos = 0
         self.video_path = None
@@ -238,3 +244,16 @@ class Video(EventDispatcher):
         if self.video_img.winfo_exists():
             self.video_img.imgtk = imgtk
             self.video_img.config(image=imgtk)
+        # FPS overlay logic
+        if self.show_fps and self.fps_label:
+            now = time.time()
+            self._frame_times.append(now)
+            # Keep only last 10 frame times
+            if len(self._frame_times) > 10:
+                self._frame_times.pop(0)
+            if len(self._frame_times) >= 2:
+                elapsed = self._frame_times[-1] - self._frame_times[0]
+                fps = (len(self._frame_times) - 1) / elapsed if elapsed > 0 else 0.0
+                self.fps_label.config(text=f"{fps:.1f} fps")
+            else:
+                self.fps_label.config(text="")
