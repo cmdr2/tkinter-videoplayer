@@ -64,34 +64,43 @@ You can also edit the default theme by modifying `theme.py`.
 - `load`: Called when the video loads
 
 ## Usage Example
-See the [examples](examples/) folder for more.. examples!
+See the [examples](examples/) folder for more examples!
+
+- **01_combined_examples.py**: Shows four different video player configurations in a single 2x2 grid window, each with a title, video, and code snippet.
+- **02_events.py**: Demonstrates how to use event listeners for play, pause, and end events.
+- **03_external_controls.py**: Shows how to control the video player externally with custom buttons.
 
 ```python
+# Example: Basic usage
 from tkinter_video import VideoPlayer
 import tkinter as tk
 
 root = tk.Tk()
 player = VideoPlayer(root, video_path='sample.mp4', height=360)
 player.frame.pack()
+root.mainloop()
+```
 
-# Control playback
-player.play()
-player.pause()
-player.stop()
-
-# Add event handlers
+```python
+# Example: Adding event listeners (see 02_events.py)
 def handle_play():
-   print("Video started!")
-
+    print("Video started!")
 def handle_pause():
-   print("Video paused.")
-
+    print("Video paused.")
 def handle_ended():
-   print("Video ended.")
+    print("Video ended.")
 
 player.add_event_listener("play", handle_play)
 player.add_event_listener("pause", handle_pause)
-player.add_event_listener("stop", handle_stop)
+player.add_event_listener("ended", handle_ended)
+```
 
-root.mainloop()
+```python
+# Example: External controls (see 03_external_controls.py)
+btn_play = tk.Button(root, text="Play", command=player.play)
+btn_pause = tk.Button(root, text="Pause", command=player.pause)
+btn_stop = tk.Button(root, text="Stop", command=player.stop)
+btn_play.pack()
+btn_pause.pack()
+btn_stop.pack()
 ```
