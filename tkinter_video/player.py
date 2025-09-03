@@ -92,7 +92,8 @@ class VideoPlayer(EventDispatcher):
 
     def _toggle_playback(self, event=None):
         was_playing = self.player.playing and not self.player.paused
-        self.controls_bar._toggle_play_pause()
+        if self.controls_bar:
+            self.controls_bar._toggle_play_pause()
         # If video was playing and is now paused, show controls
         if was_playing and self.player.paused:
             self._show_controls()
