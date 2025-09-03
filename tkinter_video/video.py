@@ -74,6 +74,8 @@ class Video(EventDispatcher):
         # Start a new playback
         self.playing = True
         self.paused = False
+        # Start play loop and track callback ID
+        self._play_loop_callback_id = None
         self._play_loop_tk()
         self.dispatch_event("play")
 
@@ -84,6 +86,10 @@ class Video(EventDispatcher):
     def stop(self):
         self.playing = False
         self.paused = False
+        # Cancel any scheduled play loop callback
+        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+            self.parent.after_cancel(self._play_loop_callback_id)
+            self._play_loop_callback_id = None
         if self.cap:
             self.cap.release()
             self.cap = None
@@ -134,13 +140,13 @@ class Video(EventDispatcher):
             self.stop()
             return
         if self.paused:
-            self.parent.after(50, self._play_loop_tk)
+            self._play_loop_callback_id = self.parent.after(50, self._play_loop_tk)
             return
         self._display_current_frame(advance=True)
-        # Schedule next frame update
+        # Schedule next frame update and track callback ID
         fps = self.cap.get(cv2.CAP_PROP_FPS)
         delay = int(1000 / max(fps, 25))
-        self.parent.after(delay, self._play_loop_tk)
+        self._play_loop_callback_id = self.parent.after(delay, self._play_loop_tk)
 
     def _display_current_frame(self, advance=False):
         """
@@ -151,8 +157,16 @@ class Video(EventDispatcher):
         if advance:
             ret, frame = self.cap.read()
             if not ret:
+                # Cleanup playback state when video ends
                 self.playing = False
                 self.paused = False
+                self.frame_pos = 0
+                # Cancel any scheduled play loop callback
+                if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+                    self.parent.after_cancel(self._play_loop_callback_id)
+                    self._play_loop_callback_id = None
+                if self.cap:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 self.dispatch_event("ended")
                 return
             self.frame_pos = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))

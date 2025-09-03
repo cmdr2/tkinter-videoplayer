@@ -84,11 +84,11 @@ class VideoPlayer(EventDispatcher):
                 pass
 
     def _on_video_end(self):
-        if self._loop:
-            self.player.seek(0)
-            self.player.play()
-
         self.dispatch_event("ended")
+
+        if self._loop:
+            self.player.currentTime = 0
+            self.player.play()
 
     def _toggle_playback(self, event=None):
         was_playing = self.player.playing and not self.player.paused
