@@ -7,7 +7,7 @@ from .events import EventDispatcher
 
 
 class Video(EventDispatcher):
-    def __init__(self, parent, width=640, height=480, loop=False, show_fps=True):
+    def __init__(self, parent, width=640, height=480, loop=False, show_fps=False):
         super().__init__()
         self.parent = parent
         self.width = width
