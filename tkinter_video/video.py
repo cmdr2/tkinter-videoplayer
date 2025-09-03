@@ -74,6 +74,8 @@ class Video(EventDispatcher):
         # Handle resuming from pause state
         if self.playing and self.paused:
             self.paused = False
+            self._frame_times.clear()
+            self._play_loop_tk()  # Restart play loop to advance frames
             self.dispatch_event("play")
             return
 
@@ -85,6 +87,7 @@ class Video(EventDispatcher):
         self.playing = True
         self.paused = False
         self._play_loop_callback_id = None
+        self._frame_times.clear()
         self._play_loop_tk()
         self.dispatch_event("play")
 
