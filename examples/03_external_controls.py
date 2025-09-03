@@ -18,6 +18,8 @@ player.frame.pack()
 controls_frame = tk.Frame(root)
 controls_frame.pack(pady=10)
 
+root.resizable(False, False)
+
 
 def play():
     player.play()

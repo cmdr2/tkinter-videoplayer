@@ -12,6 +12,8 @@ root.title("Events Example - MessageBox")
 player = VideoPlayer(root, video_path=video_path, height=360)
 player.frame.pack()
 
+root.resizable(False, False)
+
 
 def on_play():
     messagebox.showinfo("Event", "Video started!")
