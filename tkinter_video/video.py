@@ -7,7 +7,7 @@ from .events import EventDispatcher
 
 
 class Video(EventDispatcher):
-    def __init__(self, parent, width=640, height=480):
+    def __init__(self, parent, width=640, height=480, loop=False):
         super().__init__()
         self.parent = parent
         self.width = width
@@ -22,6 +22,7 @@ class Video(EventDispatcher):
         self.thread = None
         self.frame_pos = 0
         self.video_path = None
+        self.loop = loop
 
         def bubble_event_to_top(event, event_type):
             parent_frame = self.frame.master
@@ -59,6 +60,11 @@ class Video(EventDispatcher):
         if not self.cap and self.video_path:
             self.cap = cv2.VideoCapture(self.video_path)
 
+        # Cancel any previous scheduled play loop callback before starting a new one
+        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+            self.parent.after_cancel(self._play_loop_callback_id)
+            self._play_loop_callback_id = None
+
         # Handle resuming from pause state
         if self.playing and self.paused:
             self.paused = False
@@ -72,10 +78,18 @@ class Video(EventDispatcher):
         # Start a new playback
         self.playing = True
         self.paused = False
-        # Start play loop and track callback ID
         self._play_loop_callback_id = None
         self._play_loop_tk()
         self.dispatch_event("play")
+
+    def restart_loop(self):
+        # Restart playback from the beginning for looping, without releasing or recreating cap.
+        if self.cap:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            self.frame_pos = 0
+        self.playing = True
+        self.paused = False
+        # Do not stop the play loop, just reset frame position
 
     def pause(self):
         self.paused = True
@@ -155,18 +169,32 @@ class Video(EventDispatcher):
         if advance:
             ret, frame = self.cap.read()
             if not ret:
-                # Cleanup playback state when video ends
-                self.playing = False
-                self.paused = False
-                self.frame_pos = 0
-                # Cancel any scheduled play loop callback
-                if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
-                    self.parent.after_cancel(self._play_loop_callback_id)
-                    self._play_loop_callback_id = None
-                if self.cap:
+                if getattr(self, "loop", False):
+                    # If looping, seek to start and continue
                     self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                self.dispatch_event("ended")
-                return
+                    self.frame_pos = 0
+                    ret, frame = self.cap.read()
+                    if not ret:
+                        # If still can't read, stop
+                        self.playing = False
+                        self.paused = False
+                        self.frame_pos = 0
+                        if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+                            self.parent.after_cancel(self._play_loop_callback_id)
+                            self._play_loop_callback_id = None
+                        self.dispatch_event("ended")
+                        return
+                else:
+                    # Cleanup playback state when video ends
+                    self.playing = False
+                    self.paused = False
+                    self.frame_pos = 0
+                    # Cancel any scheduled play loop callback
+                    if hasattr(self, "_play_loop_callback_id") and self._play_loop_callback_id:
+                        self.parent.after_cancel(self._play_loop_callback_id)
+                        self._play_loop_callback_id = None
+                    self.dispatch_event("ended")
+                    return
             self.frame_pos = int(self.cap.get(cv2.CAP_PROP_POS_FRAMES))
         else:
             pos = self.cap.get(cv2.CAP_PROP_POS_FRAMES)

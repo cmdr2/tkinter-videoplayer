@@ -20,7 +20,7 @@ class VideoPlayer(EventDispatcher):
         # Create a dedicated frame for the component
         self.frame = tk.Frame(parent, width=width, height=height)
         self.frame.place(x=0, y=0, relwidth=1, relheight=1)
-        self.player = Video(self.frame, width=width, height=height)
+        self.player = Video(self.frame, width=width, height=height, loop=loop)
         self.player.frame.place(x=0, y=0, relwidth=1, relheight=1)
 
         # Bind events to the overall component frame
@@ -63,6 +63,9 @@ class VideoPlayer(EventDispatcher):
     def _on_load(self):
         self.dispatch_event("load")
 
+    def _on_video_end(self):
+        self.dispatch_event("ended")
+
     def _show_controls(self, event=None):
         if self.controls_bar and self.controls_bar.frame:
             self.controls_bar.frame.place(
@@ -82,13 +85,6 @@ class VideoPlayer(EventDispatcher):
             else:
                 # Fallback: always show controls if state can't be determined
                 pass
-
-    def _on_video_end(self):
-        self.dispatch_event("ended")
-
-        if self._loop:
-            self.player.currentTime = 0
-            self.player.play()
 
     def _toggle_playback(self, event=None):
         was_playing = self.player.playing and not self.player.paused
