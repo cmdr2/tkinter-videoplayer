@@ -24,11 +24,9 @@ class Video(EventDispatcher):
         self.video_path = None
 
         def bubble_event_to_top(event, event_type):
-            # Find the topmost frame (component frame)
-            top = self.frame
-            while hasattr(top, "master") and isinstance(top.master, tk.Frame):
-                top = top.master
-            top.event_generate(event_type, x=event.x, y=event.y)
+            parent_frame = self.frame.master
+            if isinstance(parent_frame, tk.Frame):
+                parent_frame.event_generate(event_type, x=event.x, y=event.y)
 
         for btn in ("<Button-1>", "<Button-2>", "<Enter>", "<Leave>", "<Key-space>"):
             self.video_img.bind(btn, lambda e, btn=btn: bubble_event_to_top(e, btn))
