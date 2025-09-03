@@ -53,7 +53,7 @@ You can also edit the default theme by modifying `theme.py`.
 #### Properties
 - `autoplay` (bool): Whether playback starts automatically when loaded.
 - `loop` (bool): Whether playback loops when the video ends.
-- `controls_enabled` (bool): Whether playback controls are shown.
+- `controls` (bool): Whether playback controls are shown.
 - `currentTime` (float): Current playback time in seconds (get/set).
 - `duration` (float): Duration of the loaded video in seconds (read-only).
 

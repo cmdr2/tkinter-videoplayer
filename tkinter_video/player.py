@@ -10,11 +10,11 @@ class VideoPlayer(EventDispatcher):
     def __init__(self, parent, video_path=None, width=640, height=480, controls=True, autoplay=False, loop=False):
         super().__init__()
         self.parent = parent
-        self._controls_enabled = controls
+        self._controls = controls
         self._autoplay = autoplay
         self._loop = loop
         self._src = video_path
-        self.controls = None
+        self.controls_bar = None
         self.seek_slider = None
 
         # Create a dedicated frame for the component
@@ -31,17 +31,17 @@ class VideoPlayer(EventDispatcher):
         self.frame.bind("<Configure>", self._show_controls)
         self.frame.focus_set()  # Ensure frame can receive key events
 
-        if self._controls_enabled:
-            self.controls = Controls(self.player.frame, videoplayer=self.player)
+        if self._controls:
+            self.controls_bar = Controls(self.player.frame, videoplayer=self.player)
             # Overlay controls at bottom, initially visible
-            self.controls.frame.place(
+            self.controls_bar.frame.place(
                 x=0,
                 y=self.player.frame.winfo_height() - CONTROLS_BAR_HEIGHT_PX,
                 relwidth=1,
                 height=CONTROLS_BAR_HEIGHT_PX,
             )
-            self.controls.frame.lift()
-            self.seek_slider = self.controls.slider_canvas if hasattr(self.controls, "slider_canvas") else None
+            self.controls_bar.frame.lift()
+            self.seek_slider = self.controls_bar.slider_canvas if hasattr(self.controls_bar, "slider_canvas") else None
 
         # Forward video player events to component listeners
         self.player.add_event_listener("play", self._forward_event)
@@ -58,21 +58,21 @@ class VideoPlayer(EventDispatcher):
         self.dispatch_event(event_type, **kwargs)
 
     def _show_controls(self, event=None):
-        if self.controls and self.controls.frame:
-            self.controls.frame.place(
+        if self.controls_bar and self.controls_bar.frame:
+            self.controls_bar.frame.place(
                 x=0,
                 y=self.player.frame.winfo_height() - CONTROLS_BAR_HEIGHT_PX,
                 relwidth=1,
                 height=CONTROLS_BAR_HEIGHT_PX,
             )
-            self.controls.frame.lift()
+            self.controls_bar.frame.lift()
 
     def _hide_controls(self, event=None):
         # Only hide controls if video is playing
-        if self.controls and self.controls.frame:
+        if self.controls_bar and self.controls_bar.frame:
             if hasattr(self.player, "playing") and hasattr(self.player, "paused"):
                 if self.player.playing and not self.player.paused:
-                    self.controls.frame.place_forget()
+                    self.controls_bar.frame.place_forget()
             else:
                 # Fallback: always show controls if state can't be determined
                 pass
@@ -84,19 +84,18 @@ class VideoPlayer(EventDispatcher):
 
     def _toggle_playback(self, event=None):
         was_playing = self.player.playing and not self.player.paused
-        self.controls._toggle_play_pause()
+        self.controls_bar._toggle_play_pause()
         # If video was playing and is now paused, show controls
         if was_playing and self.player.paused:
             self._show_controls()
 
     @property
-    def controls_enabled(self):
-        return self._controls_enabled
+    def controls(self):
+        return self._controls
 
-    @controls_enabled.setter
-    def controls_enabled(self, value):
-        self._controls_enabled = bool(value)
-        # Could add logic to show/hide controls dynamically
+    @controls.setter
+    def controls(self, value):
+        self._controls = bool(value)
 
     @property
     def autoplay(self):
