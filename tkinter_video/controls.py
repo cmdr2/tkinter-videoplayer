@@ -15,7 +15,7 @@ class Controls:
         videoplayer.add_event_listener("pause", self._on_pause)
         videoplayer.add_event_listener("ended", self._on_ended)
 
-        self.frame = tk.Frame(parent, bg=theme.COLOR_VIDEO_BG)
+        self.frame = tk.Frame(parent, bg=theme.COLOR_CONTROLS_BG)
         self.frame.pack(fill=tk.X, padx=10, pady=5)
 
         # Play/Pause Button (icon)
@@ -29,8 +29,8 @@ class Controls:
         self.play_pause_btn = tk.Button(
             self.frame,
             image=self.play_icon,
-            bg=theme.COLOR_VIDEO_BG,
-            activebackground=theme.COLOR_BTN_ACTIVE_BG,
+            bg=theme.COLOR_CONTROLS_BG,
+            activebackground=theme.COLOR_CONTROLS_BG,
             bd=0,
             command=self._toggle_play_pause,
         )
@@ -38,7 +38,7 @@ class Controls:
 
         # Time Counter
         self.time_label = tk.Label(
-            self.frame, text="0:00 / 0:00", font=theme.FONT, bg=theme.COLOR_VIDEO_BG, fg=theme.COLOR_VIDEO_FG
+            self.frame, text="0:00 / 0:00", font=theme.FONT, bg=theme.COLOR_CONTROLS_BG, fg=theme.COLOR_SLIDER_BG
         )
         self.time_label.pack(side=tk.LEFT, padx=8)
 
@@ -48,7 +48,7 @@ class Controls:
         self.slider_canvas = Canvas(
             self.frame,
             height=self.slider_clickable_height,
-            bg=theme.COLOR_VIDEO_BG,
+            bg=theme.COLOR_CONTROLS_BG,
             highlightthickness=0,
         )
         self.slider_canvas.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=8)
