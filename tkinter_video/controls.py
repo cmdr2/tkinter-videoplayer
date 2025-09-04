@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import Canvas
 from . import theme
@@ -19,18 +20,19 @@ class Controls:
 
         # Play/Pause Button (icon)
         self.is_playing = False
-        # Use Unicode characters for play (▶) and pause (⏸)
-        self.play_icon = "\u25b6"  # ▶
-        self.pause_icon = "\u23f8"  # ⏸
+
+        # Load icons for play and pause
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.play_icon = tk.PhotoImage(file=os.path.join(base_dir, "media", "play.png"))
+        self.pause_icon = tk.PhotoImage(file=os.path.join(base_dir, "media", "pause.png"))
+
         self.play_pause_btn = tk.Button(
             self.frame,
-            text=self.play_icon,
-            font=(theme.FONT[0], 18),
-            bg=theme.COLOR_BTN_BG,
+            image=self.play_icon,
+            bg=theme.COLOR_VIDEO_BG,
             activebackground=theme.COLOR_BTN_ACTIVE_BG,
             bd=0,
             command=self._toggle_play_pause,
-            fg=theme.COLOR_VIDEO_FG,
         )
         self.play_pause_btn.pack(side=tk.LEFT, padx=8)
 
@@ -130,9 +132,9 @@ class Controls:
             return
 
         if self.is_playing:
-            self.play_pause_btn.config(text=self.pause_icon)
+            self.play_pause_btn.config(image=self.pause_icon)
         else:
-            self.play_pause_btn.config(text=self.play_icon)
+            self.play_pause_btn.config(image=self.play_icon)
 
     def update_time(self, current, total):
         # Check if label still exists before updating
