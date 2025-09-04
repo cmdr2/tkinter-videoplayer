@@ -5,11 +5,15 @@ A simple video player component for Tkinter, built with OpenCV and Pillow.
 The current alternatives either didn't work (outdated dependencies) or used `av` (which requires compilation).
 
 ## Features
-- Includes (optional) controls to play, pause, stop, and seek video files
-- Toggle play/pause with a button or click or spacebar
-- Looks decent visually, and can be customized from `theme.py`
-- Doesn't use `av` (which requires compilation on the host system)
+- Batteries included: Includes controls to play, pause, stop, and seek video files
+- Familiar UI: Toggle play/pause with a button or click or spacebar
+- Easy to install: Doesn't use `av` (which requires compilation on the host system)
+- Looks decent visually, and can be customized in `theme.py`
 - Works by rendering frames using OpenCV and Pillow
+
+## Screenshot
+<img height="220" alt="screenshot" src="https://github.com/user-attachments/assets/56755c74-9044-4b27-ab2d-022a8d40a704" />
+
 
 ## Installation
 
