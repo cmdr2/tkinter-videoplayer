@@ -156,17 +156,33 @@ class Controls:
             return
 
         self.slider_canvas.delete("all")
-        # Get current width dynamically
+        # Internal horizontal padding to prevent knob cutoff
+        slider_padding = 8
         slider_length = self.slider_canvas.winfo_width()
+        usable_length = max(0, slider_length - 2 * slider_padding)
         center_y = self.slider_clickable_height // 2
         # Draw background line (thin)
-        self.slider_canvas.create_line(0, center_y, slider_length, center_y, fill=theme.COLOR_TERTIARY, width=3)
+        self.slider_canvas.create_line(
+            slider_padding,
+            center_y,
+            slider_length - slider_padding,
+            center_y,
+            fill=theme.COLOR_TERTIARY,
+            width=3,
+        )
         # Draw progress line
         if self.slider_max > 0:
-            progress = int((self.slider_value / self.slider_max) * slider_length)
+            progress = int((self.slider_value / self.slider_max) * usable_length) + slider_padding
         else:
-            progress = 0
-        self.slider_canvas.create_line(0, center_y, progress, center_y, fill=theme.COLOR_PRIMARY, width=3)
+            progress = slider_padding
+        self.slider_canvas.create_line(
+            slider_padding,
+            center_y,
+            progress,
+            center_y,
+            fill=theme.COLOR_PRIMARY,
+            width=3,
+        )
         # Draw draggable knob (thin, centered)
         self.slider_canvas.create_oval(
             progress - 5,
