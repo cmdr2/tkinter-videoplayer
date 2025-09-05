@@ -12,7 +12,8 @@ The current alternatives either didn't work (outdated dependencies) or used `av`
 - Works by rendering frames using OpenCV and Pillow
 
 ## Screenshot
-<img height="220" alt="screenshot" src="https://github.com/user-attachments/assets/2193a200-bd83-4d92-900a-9dc2d4e859c5" />
+<img height="220" alt="screenshot" src="https://github.com/user-attachments/assets/81a93dbf-fb35-49e0-a50b-0cc5bb2ef6df" />
+
 
 
 
