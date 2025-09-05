@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tkinter-video"
+name = "tkinter-videoplayer"
 version = "1.0.0"
 description = "A simple video player widget for Tkinter."
 authors = [
@@ -19,9 +19,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cmdr2/tkinter-video"
-Repository = "https://github.com/cmdr2/tkinter-video"
+Homepage = "https://github.com/cmdr2/tkinter-videoplayer"
+Repository = "https://github.com/cmdr2/tkinter-videoplayer"
 
 [tool.setuptools]
-packages = ["tkinter_video"]
+packages = ["tkinter_videoplayer"]
 include-package-data = true

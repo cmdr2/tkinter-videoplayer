@@ -1,4 +1,4 @@
-# tkinter-video
+# tkinter-videoplayer
 
 A simple video player component for Tkinter, built with OpenCV and Pillow.
 
@@ -27,7 +27,7 @@ The current alternatives either didn't work (outdated dependencies) or used `av`
 ## Quick Start
 
 ```python
-from tkinter_video import VideoPlayer
+from tkinter_videoplayer import VideoPlayer
 import tkinter as tk
 
 root = tk.Tk()
@@ -77,7 +77,7 @@ See the [examples](examples/) folder for more examples!
 
 ```python
 # Example: Basic usage
-from tkinter_video import VideoPlayer
+from tkinter_videoplayer import VideoPlayer
 import tkinter as tk
 
 root = tk.Tk()

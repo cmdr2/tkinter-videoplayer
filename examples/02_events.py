@@ -1,5 +1,5 @@
 import os
-from tkinter_video import VideoPlayer
+from tkinter_videoplayer import VideoPlayer
 import tkinter as tk
 from tkinter import messagebox
 

@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import font
-from tkinter_video import VideoPlayer
+from tkinter_videoplayer import VideoPlayer
 
 video_path = "example.mp4"
 video_path = os.path.join(os.path.dirname(__file__), video_path)
