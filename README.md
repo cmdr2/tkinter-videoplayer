@@ -17,12 +17,9 @@ The current alternatives either didn't work (outdated dependencies) or used `av`
 
 
 ## Installation
-
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Import the component in your Tkinter project.
+```bash
+pip install tkinter-videoplayer
+```
 
 ## Quick Start
 
