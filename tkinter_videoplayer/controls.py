@@ -34,7 +34,7 @@ class Controls:
             bd=0,
             command=self._toggle_play_pause,
         )
-        self.play_pause_btn.pack(side=tk.LEFT, padx=8)
+        self.play_pause_btn.pack(side=tk.LEFT, padx=(16, 8))
 
         # Time Counter
         self.time_label = tk.Label(
