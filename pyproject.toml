@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tkinter-videoplayer"
-version = "1.0.1"
+version = "1.0.2"
 description = "A simple video player widget for Tkinter."
 authors = [
     { name = "cmdr2", email = "dev@cmdr2.org" }
