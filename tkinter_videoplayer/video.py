@@ -149,14 +149,78 @@ class Video(EventDispatcher):
         if was_playing:
             self.paused = False
 
+    def _get_duration_manual_count(self):
+        """Get duration by manually counting frames (slower but more accurate)."""
+        if not self.cap or not self.cap.isOpened():
+            return None
+
+        # Save current position
+        current_pos = self.cap.get(cv2.CAP_PROP_POS_FRAMES)
+
+        # Reset to beginning
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        if fps <= 0:
+            # Restore position
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, current_pos)
+            return None
+
+        frame_count = 0
+        while True:
+            ret, _ = self.cap.read()
+            if not ret:
+                break
+            frame_count += 1
+
+            # Safety check to avoid infinite loops on very long videos
+            if frame_count > 10000:
+                break
+
+        # Restore original position
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, current_pos)
+
+        return frame_count / fps
+
     @property
     def duration(self):
-        """Get the duration of the video in seconds."""
+        """
+        Get the duration of the video in seconds using accurate methods.
+
+        This method tries multiple approaches to get accurate video duration:
+        1. Manual frame counting (slower but more reliable than cv2 properties)
+        2. cv2 properties (fastest but can be inaccurate for some video formats)
+
+        Returns:
+            float: Duration in seconds, or 0.0 if all methods fail
+        """
         if not self.cap:
             return 0.0
-        frame_count = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
+
+        # Get cv2 properties first for decision making
+        frame_count_cv2 = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
         fps = self.cap.get(cv2.CAP_PROP_FPS)
-        return frame_count / fps if fps > 0 else 0.0
+
+        if fps <= 0:
+            return 0.0
+
+        # Method 1: Manual frame counting (more accurate than cv2 properties)
+        # Use for shorter videos or when cv2 properties seem unreliable
+        estimated_duration = frame_count_cv2 / fps
+
+        # Use manual counting for videos that seem short (< 10 seconds) or
+        # when frame count seems suspicious (very high frame count for short duration)
+        should_use_manual = (
+            estimated_duration < 10.0 or frame_count_cv2 > fps * 10  # Short videos  # Suspiciously high frame count
+        )
+
+        if should_use_manual:
+            manual_duration = self._get_duration_manual_count()
+            if manual_duration is not None and manual_duration > 0:
+                return manual_duration
+
+        # Method 2: Fallback to cv2 properties
+        return estimated_duration
 
     def _play_loop_tk(self):
         if not self.playing or not self.cap or not self.cap.isOpened():
