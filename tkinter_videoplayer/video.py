@@ -54,6 +54,7 @@ class Video(EventDispatcher):
         if new_w != self.width or new_h != self.height:
             self.width, self.height = new_w, new_h
             self._display_current_frame()
+            self.dispatch_event("resize")
         # Resume video if it was playing before resize
         if was_playing:
             self.paused = False

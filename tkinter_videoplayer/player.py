@@ -48,6 +48,7 @@ class VideoPlayer(EventDispatcher):
         self.player.add_event_listener("pause", self._on_pause)
         self.player.add_event_listener("ended", self._on_video_end)
         self.player.add_event_listener("load", self._on_load)
+        self.player.add_event_listener("resize", self._on_video_resize)
 
         if self._src:
             self.player.load(self._src)
@@ -65,6 +66,10 @@ class VideoPlayer(EventDispatcher):
 
     def _on_video_end(self):
         self.dispatch_event("ended")
+
+    def _on_video_resize(self):
+        """Handle video frame resize by updating controls position"""
+        self._show_controls()
 
     def _show_controls(self, event=None):
         if self.controls_bar and self.controls_bar.frame:
